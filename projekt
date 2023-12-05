@@ -1,0 +1,100 @@
+// piskvorky.cpp: Definuje vstupní bod pro aplikaci.
+//
+
+#include "piskvorky.h"
+
+#include <cstdio>
+#include <vector>
+
+using namespace std;
+
+// funkce na zobrazení hraciho pole
+void displayBoard(const vector<vector<char>>& board) {
+    printf("  0 1 2\n");
+    printf(" ------\n");
+    for (int i = 0; i < 3; ++i) {
+        printf("%d|", i);
+        for (int j = 0; j < 3; ++j) {
+            printf("%c|", board[i][j]);
+        }
+        printf("\n ------\n");
+    }
+    printf("\n");
+}
+
+// Funkce, ktera kontroluje zda hrac vyhral
+bool checkWin(const vector<vector<char>>& board, char player) {
+   
+    // kontrola radku a sloupce
+    for (int i = 0; i < 3; ++i) {
+        if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) ||
+            (board[0][i] == player && board[1][i] == player && board[2][i] == player)) {
+            return true;
+        }
+    }
+
+    // kontrola diagonaly
+    if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
+        (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {
+        return true;
+    }
+
+    return false;
+}
+
+// Funkce, na kontrolu remízy (plná hrací plocha)
+bool isBoardFull(const vector<vector<char>>& board) {
+    for (const auto& row : board) {
+        for (char cell : row) {
+            if (cell == ' ')
+                return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    vector<vector<char>> board(3, vector<char>(3, ' ')); // Inicializace prázdné 3x3 plochy
+    char currentPlayer = 'X'; // 'X' zacina hru
+
+    printf("Vitejte!\n");
+
+    do {
+        // Zobrazení aktuálního stavu plochy
+        displayBoard(board);
+
+        // Tah hrace
+        int row, col;
+        printf("Hrac %c, na tahu (radek and sloupec): ", currentPlayer);
+        scanf("%d %d", &row, &col);
+
+        // kontrola, zda je pohyb platný
+        if (row < 0 || row >= 3 || col < 0 || col >= 3 || board[row][col] != ' ') {
+            printf("Neplatny pohyb. Zkuste znovu.\n");
+            continue;
+        }
+
+        // tah
+        board[row][col] = currentPlayer;
+
+        // Funkce, na kontrolu, zda nejaky hrac vyhral
+        if (checkWin(board, currentPlayer)) {
+            displayBoard(board);
+            printf("Hrac %c vyhrava! Gratulace!\n", currentPlayer);
+            break;
+        }
+
+        // Funkce, na kontrolu remízy (plná hrací plocha)
+        if (isBoardFull(board)) {
+            displayBoard(board);
+            printf("Remiza! Konec hry.\n");
+            break;
+        }
+
+        // Stridani hracu
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+
+    } while (true);
+
+    return 0;
+}
